@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.UserDao">
+    <insert id="insert">
+        insert into t_user(name,pass,salt)values(#{name},#{pass},#{salt})
+    </insert>
+    <select id="selectUser" resultType="user">
+        select name,pass,salt from t_user where name=#{name}
+    </select>
+</mapper>

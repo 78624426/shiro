@@ -23,7 +23,7 @@ public class LoginServlet extends HttpServlet{
 
         try{
             sub.login(tok);
-            req.setAttribute("name",name);
+            //req.setAttribute("name",name);
             resp.sendRedirect(req.getContextPath()+"/success.jsp");
         }catch (Exception e){
             req.setAttribute("msg","用户名或密码错误");

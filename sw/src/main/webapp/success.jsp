@@ -20,6 +20,12 @@
     <%--如果已经登录，则进行授权--%>
     <shiro:authenticated>
         欢迎你：<shiro:principal/><a href="${pageContext.request.contextPath}/logout">注销</a>
+        <shiro:hasRole name="manager">
+            你是管理员，可管理其他用户
+        </shiro:hasRole>
+        <shiro:hasRole name="member">
+            你是会员，可查看商品信息
+        </shiro:hasRole>
     </shiro:authenticated>
 </body>
 </html>

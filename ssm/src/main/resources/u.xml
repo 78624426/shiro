@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+">
+
+    <!--1.dao配置-->
+    <context:property-placeholder location="classpath:driver.properties"/>
+    <bean id="ds" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="${driver}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${user}"/>
+        <property name="password" value="${pass}"/>
+    </bean>
+    <bean id="sf" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="ds"/>
+        <property name="mapperLocations" value="classpath:mapper/*Mapper.xml"/>
+        <!--别名-->
+        <property name="typeAliasesPackage" value="pojo"/>
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sf"/>
+        <property name="basePackage" value="dao"/>
+    </bean>
+
+    <!--service配置-->
+    <context:component-scan base-package="service.impl"/>
+    <bean id="tm" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="ds"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="tm"/>
+
+    <!--使用api中的realm-->
+    <bean id="jr" class="org.apache.shiro.realm.jdbc.JdbcRealm">
+        <property name="dataSource" ref="ds"/>
+        <property name="authenticationQuery">
+            <value>select pass from t_user where name=?</value>
+        </property>
+    </bean>
+    <!--自动扫描realm包并生成bean-->
+    <context:component-scan base-package="realm"/>
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realms">
+            <list>
+                <ref bean="jr"/>
+            </list>
+        </property>
+    </bean>
+    <!--注意：此处bean的id必须跟web.xml中shiro的过滤器名一致-->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <!--如果没有认证通过，跳转到此处-->
+        <property name="loginUrl" value="/showLogin"/>
+        <property name="filterChainDefinitions">
+            <value>
+                /showRegist=anon
+                /user/regist=anon
+                /user/login=anon
+                /**=authc
+            </value>
+        </property>
+    </bean>
+    <!--下面用来管理shiro过滤器的生命周期，必须配置-->
+    <bean class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+</beans>

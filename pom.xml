@@ -11,6 +11,9 @@
     <modules>
         <module>demo</module>
         <module>sw</module>
+        <module>sssm</module>
+        <module>sssm</module>
+        <module>ssm</module>
     </modules>
 
 
