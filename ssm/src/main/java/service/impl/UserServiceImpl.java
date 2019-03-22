@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pojo.User;
 import service.UserService;
 import sun.misc.BASE64Encoder;
+import util.PassUtil;
 
 
 import java.security.MessageDigest;
@@ -24,13 +25,16 @@ public class UserServiceImpl implements UserService{
     UserDao dao;
     @Override
     public void regist(User u) {
-        handle(u);
+        //handle(u);
+        String salt = PassUtil.randomSalt();
+        u.setPass(PassUtil.encode(u.getPass(),salt));
+        u.setSalt(salt);
         dao.insert(u);
     }
 
     @Override
     public String login(User u) {
-       handle(u);
+       //handle(u);
         UsernamePasswordToken t = new UsernamePasswordToken(u.getName(),u.getPass());
         Subject sub = SecurityUtils.getSubject();
         String err=null;
